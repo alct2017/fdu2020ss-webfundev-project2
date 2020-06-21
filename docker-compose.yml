@@ -1,0 +1,25 @@
+version: "3"
+services:
+    db:
+        image: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: example
+            MYSQL_DATABASE: web-pj2
+            MYSQL_USER: user
+            MYSQL_PASSWORD: mypassword
+        volumes: 
+            - ./db/sql:/docker-entrypoint-initdb.d
+
+    web:
+        build: 
+            context: .
+            dockerfile: apache-php.dockerfile
+        volumes: 
+            - ./web:/var/www/html
+        ports: 
+            - 80:80
+
+    adminer:
+        image: adminer
+        ports: 
+            - 8088:8080
