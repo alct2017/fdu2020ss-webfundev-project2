@@ -2,7 +2,7 @@
   <div id="side-button-group">
     <b-button-group vertical>
       <b-button variant="outline-secondary">
-        <b-icon icon="arrow-clockwise" aria-hidden="true"></b-icon>
+        <b-icon icon="arrow-clockwise" aria-hidden="true" @click="fresh"></b-icon>
       </b-button>
       <b-button variant="outline-secondary">
         <b-icon icon="chevron-bar-up" aria-hidden="true"></b-icon>
@@ -12,7 +12,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    fresh() {
+      this.$emit("fresh");
+    }
+  }
+};
 </script>
 
 <style>

@@ -5,11 +5,10 @@ require_once("./getPost.php");
 require_once("./Password.php");
 $return["actionState"] = false;
 $POST = getPOST();
-if (($email = "'" . $POST->email . "'")
+if (($email = $POST->email)
     && ($username = $POST->username)
     && ($password = $POST->password)
 ) {
-    echo $email;
     $db = CONNECT();
     $checkEmail = $db->prepare(<<<SQL
         SELECT * FROM traveluser WHERE Email = :email
@@ -19,24 +18,33 @@ if (($email = "'" . $POST->email . "'")
     if ($checkEmail->fetch()) {
         $return["error"] = "Email is signed";
     } else {
-        $db->beginTransaction();
-        $createUser = $db->prepare(<<<SQL
+        try {
+            $db->beginTransaction();
+            $createUser = $db->prepare(<<<SQL
             INSERT INTO traveluser
-            (Email,UserName,Pass,
+            (Email,UserName,
             DateJoined,DateLastModified)
             VALUES
-            (:email,:username,:password,
+            (:email,:username,
             CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())
         SQL);
-        $createUser->bindValue(":email", $email);
-        $createUser->bindValue(":username", $username);
-        $createUser->bindValue(":password", PASSWORD($password));
-        if ($createUser->execute()) {
+            $createUser->bindValue(":email", $email);
+            $createUser->bindValue(":username", $username);
+            if (!$createUser->execute()) throw new Error();
+            $checkEmail->execute();
+            $thisUser = $checkEmail->fetch();
+            $setPass = $db->prepare(<<<SQL
+            UPDATE traveluser SET Pass = :passHash
+            WHERE UID = :uid
+        SQL);
+            $setPass->bindValue(":passHash", generateHash($password, $thisUser["DateLastModified"]));
+            $setPass->bindValue(":uid", $thisUser["UID"]);
+            if (!$setPass->execute()) throw new Error();
             $db->commit();
             $checkEmail->execute();
             $id = $checkEmail->fetch()["UID"];
             getUserInfo($id)->attach($return, true);
-        } else {
+        } catch (\Throwable $e) {
             $db->rollBack();
             $return["error"] = "Fail to create user";
         }

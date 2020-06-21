@@ -48,7 +48,9 @@ if (isset($_REQUEST["item"])) {
     }
     $sql->execute();
     while ($row = $sql->fetch()) {
-        $result[] = $row["0"];
+        if ($row["0"]) {
+            $result[] = $row["0"];
+        }
     }
     echo json_encode($result);
 }

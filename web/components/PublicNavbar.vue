@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-navbar toggleable="lg" type="light" variant="light">
-      <b-navbar-brand href="#">Hello,World!</b-navbar-brand>
+      <b-navbar-brand :to="{name:'home'}">Hello,World!</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -19,11 +19,6 @@
 import items from "./NavbarMenu";
 import user from "./NavbarDropdown";
 export default {
-  data: function() {
-    return {
-      current: "Home"
-    };
-  },
   components: { items, user }
 };
 </script>

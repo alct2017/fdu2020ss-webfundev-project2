@@ -61,6 +61,18 @@ class ImageInfo extends Path
             }
         }
     }
+    public function attach(&$target)
+    {
+        foreach ($this as $prop => $value) {
+            $target[$prop] = $value;
+        }
+        $target["actionState"] = true;
+        return $this;
+    }
+}
+function getImage(int $ImageID)
+{
+    return new ImageInfo($ImageID);
 }
 class UserImageInfo extends ImageInfo
 {

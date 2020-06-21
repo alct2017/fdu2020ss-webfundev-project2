@@ -19,6 +19,7 @@ import Detail from "../components/Detail";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 import Favor from "../components/Favor";
+import Image from "../components/MyImage";
 const router = new VueRouter({
     routes: [
         {
@@ -32,7 +33,8 @@ const router = new VueRouter({
                         { name: 'search', path: 'search', component: Search },
                         { name: 'upload', path: 'upload', component: Upload },
                         { name: 'detail', path: 'detail/:id', component: Detail },
-                        { name: 'favor', path: 'favor', component: Favor }
+                        { name: 'favor', path: 'favor', component: Favor },
+                        { name: 'image', path: 'image', component: Image }
                     ]
                 },
                 {

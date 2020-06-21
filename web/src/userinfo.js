@@ -12,11 +12,16 @@ export default new Vuex.Store({
         image: []
     },
     getters: {
-        isLogin(state) { return state.login; },
+        isLogin(state) {
+            return state.login
+        },
         getUID(state, getters) { return getters.isLogin ? state.id : null; },
         getUsername(state, getters) { return getters.isLogin ? state.name : null; },
         getFavorList(state) {
             return state.favor ? state.favor : [];
+        },
+        getImageList(state) {
+            return state.image ? state.image : [];
         }
     },
     mutations: {
@@ -42,14 +47,14 @@ export default new Vuex.Store({
     },
 
     actions: {
-        request(state, [api, form]) {
-            return new Promise((resolve, reject) => {
+        request(context, [api, form]) {
+            return new Promise((resolve = () => { }, reject = error => console.log(error)) => {
                 axios
                     .post(api, form)
                     .then(response => {
                         let $receive = response.data;
                         if ($receive["actionState"]) {
-                            this.commit("setUserinfo", $receive);
+                            context.commit("setUserinfo", $receive);
                             resolve();
                         } else {
                             reject($receive["error"]);
@@ -58,23 +63,58 @@ export default new Vuex.Store({
                     .catch(error => reject(error));
             });
         },
+        freshUserinfo(context) {
+            return context.dispatch("login", { token: sessionStorage.getItem("token"), id: sessionStorage.getItem("id") });
+        },
         login(context, { email, password, remember, token, id }) {
-            return this.dispatch("request", ["./api/Login.php", { email: email, password: password, remember: remember, token: token, id: id }]);
+            return context.dispatch("request", ["./api/Login.php", { email: email, password: password, remember: remember, token: token, id: id }]);
         },
         logout(context) {
             context.commit("clearUserinfo");
         },
         signup(context, { email, username, password }) {
-            return this.dispatch("request", ["../api/Signup.php", { email: email, username: username, password: password }]);
+            return context.dispatch("request", ["../api/Signup.php", { email: email, username: username, password: password }]);
         },
         like(context, { imageid }) {
-            return this.dispatch("request", ["../api/Like.php", { id: context.state.id, imageid: imageid }]);
+            return context.dispatch("request", ["../api/Like.php", { id: context.state.id, imageid: imageid }]);
         },
         unlike(context, { imageid }) {
-            return this.dispatch("request", ["../api/Unlike.php", { id: context.state.id, imageid: imageid }]);
+            return context.dispatch("request", ["../api/Unlike.php", { id: context.state.id, imageid: imageid }]);
         },
-        upload() { },
-        delete() { },
+        upload(context, {
+            title,
+            description,
+            city,
+            country,
+            content,
+            file
+        }) {
+            let formData = new FormData();
+            formData.append("title", title);
+            formData.append("description", description);
+            formData.append("city", city);
+            formData.append("country", country);
+            formData.append("uid", context.getters.getUID);
+            formData.append("content", content);
+            formData.append("file", file);
+            return new Promise((resolve = () => { }, reject = error => console.log(error)) => {
+                axios
+                    .post("../api/Upload.php", formData)
+                    .then(responce => {
+                        if (responce["data"]["actionState"]) {
+                            context.dispatch("freshUserinfo");
+                            resolve(responce["data"]["id"]);
+                        } else {
+                            reject(responce["data"]["error"]);
+                        }
+                    })
+                    .catch(error => reject(error));
+            });
+        },
+
+        delete(context, { imageid }) {
+            context.dispatch("request", ["../api/DeleteImage.php", { id: context.getters.getUID, imageid: imageid }])
+        },
         modify() { }
     },
 });

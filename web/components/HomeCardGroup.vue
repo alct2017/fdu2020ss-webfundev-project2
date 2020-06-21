@@ -36,21 +36,21 @@ export default {
       imageList: []
     };
   },
-  computed: {
-    favorList() {
-      return this.$store.getters.getFavorList;
-    }
-  },
   created() {
     this.getList()
       .then(this.getImage)
       .catch(error => console.log(error));
   },
   methods: {
-    getList() {
+    fresh() {
+      this.getList(true)
+        .then(this.getImage)
+        .catch(error => console.log(error));
+    },
+    getList(isRandom = null) {
       return new Promise((resolve, reject) => {
         axios
-          .get("../api/GetHomeList.php")
+          .get("../api/GetHomeList.php", { params: { random: isRandom } })
           .then(response => {
             this.idList = response.data;
             resolve();
@@ -87,6 +87,11 @@ export default {
         .dispatch("unlike", { imageid: imageid })
         .then(this.getImage)
         .catch(error => console.log(error));
+    }
+  },
+  computed: {
+    favorList() {
+      return this.$store.getters.getFavorList;
     }
   }
 };

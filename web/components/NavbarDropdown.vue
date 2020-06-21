@@ -6,7 +6,7 @@
       right
     >
       <b-dropdown-item :to="{name:'upload'}">Upload</b-dropdown-item>
-      <b-dropdown-item href="#">Image</b-dropdown-item>
+      <b-dropdown-item :to="{name:'image'}">Image</b-dropdown-item>
       <b-dropdown-item :to="{name:'favor'}">Favor</b-dropdown-item>
       <b-dropdown-item @click="logout">Log out</b-dropdown-item>
     </b-nav-item-dropdown>

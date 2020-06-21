@@ -1,8 +1,8 @@
 <template>
   <div>
     <carousel></carousel>
-    <cardgroup></cardgroup>
-    <sidebutton></sidebutton>
+    <cardgroup ref="cardgroup"></cardgroup>
+    <sidebutton @fresh="fresh"></sidebutton>
   </div>
 </template>
 
@@ -11,6 +11,11 @@ import carousel from "./HomeCarousel";
 import cardgroup from "./HomeCardGroup";
 import sidebutton from "./HomeSideButton";
 export default {
+  methods: {
+    fresh() {
+      this.$refs.cardgroup.fresh();
+    }
+  },
   components: {
     carousel,
     cardgroup,

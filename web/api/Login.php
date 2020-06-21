@@ -1,6 +1,7 @@
 <?php
 require_once("./db-config.php");
 require_once("./UserInfo.php");
+require_once("./Password.php");
 $return["actionState"] = false;
 $db = CONNECT();
 $POST = json_decode(file_get_contents("php://input"));
@@ -34,7 +35,7 @@ if (($token = $POST->token) && ($id = $POST->id)) {
         $getUser->execute();
         if (!$thisUser = $getUser->fetch()) {
             $return["error"] = "User Not Found";
-        } else if (!$thisUser["Pass"] == $password) {
+        } else if (!$thisUser["Pass"] == generateHash($password, $thisUser["DateLastModified"])) {
             $return["error"] = "Password Wrong";
         } else {
             getUserInfo($thisUser["UID"])->attach($return, $POST->remember);

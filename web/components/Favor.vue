@@ -73,10 +73,10 @@ export default {
     }
   },
   created() {
-    if (!this.$store.getters.isLogin) {
-      this.$router.push({ name: "login" });
-    } else {
+    if (this.$store.getters.isLogin) {
       this.getImage();
+    } else {
+      this.$router.push({ name: "login" });
     }
   },
   methods: {

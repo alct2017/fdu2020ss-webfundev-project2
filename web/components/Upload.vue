@@ -10,12 +10,13 @@
                 <b-row>
                   <b-col lg="6" md="12" sm="12" class="mb-2">
                     <b-input-group prepend="Title">
-                      <b-form-input v-model="title"></b-form-input>
+                      <b-form-input v-model="title" required></b-form-input>
                     </b-input-group>
                   </b-col>
                   <b-col lg="6" md="6" sm="12" class="mb-2">
                     <b-form-file
                       id="fileinput"
+                      required
                       v-model="file"
                       :state="Boolean(file)"
                       placeholder="Choose a file or drop it here..."
@@ -37,15 +38,14 @@
                   </b-col>
                   <b-col lg="4" md="6" sm="12" class="mb-2">
                     <b-input-group prepend="Content">
-                      <b-form-input v-model="content" list="content-list"></b-form-input>
-                      <b-form-datalist id="content-list" :options="contentOptions"></b-form-datalist>
+                      <b-form-select v-model="content" :options="contentOptions" required></b-form-select>
                     </b-input-group>
                   </b-col>
                 </b-row>
                 <b-input-group prepend="Description" class="mb-2">
                   <b-form-textarea v-model="description" no-resize></b-form-textarea>
                 </b-input-group>
-                <b-button type="submit">Upload</b-button>
+                <b-button type="submit" variant="outline-success">Upload</b-button>
               </b-form>
             </div>
           </b-list-group-item>
@@ -66,38 +66,91 @@ export default {
       countryOptions: [],
       city: "",
       cityOptions: [],
-      content: "",
-      contentOptions: [],
+      content: "Other",
+      contentOptions: [
+        "Scenery",
+        "City",
+        "People",
+        "Animal",
+        "Building",
+        "Wonder",
+        "Other"
+      ],
       description: ""
     };
   },
   computed: {
     fileURL() {
       return this.file ? window.URL.createObjectURL(this.file) : null;
+    },
+    isValid() {
+      if (this.title && this.file && this.content) {
+        if (
+          (this.country && !this.countryOptions.length) ||
+          (this.city && !this.cityOptions)
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return false;
+      }
+    }
+  },
+  watch: {
+    country() {
+      axios
+        .get("../api/GetCountryRecommend.php", {
+          params: { country: this.country }
+        })
+        .then(response => {
+          this.countryOptions = response.data;
+        })
+        .catch(error => console.log(error));
+    },
+    city() {
+      axios
+        .get("../api/GetCityRecommend.php", {
+          params: { country: this.country, city: this.city }
+        })
+        .then(response => {
+          this.cityOptions = response.data;
+        })
+        .catch(error => console.log(error));
+    }
+  },
+  created() {
+    if (this.$store.getters.isLogin) {
+      //
+    } else {
+      this.$router.push({ name: "login" });
     }
   },
   methods: {
     upload() {
-      let formData = new FormData();
-      formData.append("title", this.title);
-      formData.append("description", this.description);
-      formData.append("city", this.city);
-      formData.append("country", this.country);
-      formData.append("uid", this.$store.getters.getUID);
-      formData.append("content", this.content);
-      formData.append("file", this.file);
-      return new Promise((resolve, reject) => {
-        axios
-          .post("../api/Upload.php", formData)
-          .then(responce => {
-            console.log(responce);
-            resolve();
+      if (this.isValid) {
+        this.$store
+          .dispatch("upload", {
+            title: this.title,
+            description: this.description,
+            city: this.city,
+            country: this.country,
+            content: this.content,
+            file: this.file
           })
+          .then(id =>
+            this.$router.push({
+              name: "detail",
+              params: { id: id }
+            })
+          )
           .catch(error => {
             console.log(error);
-            reject();
           });
-      });
+      } else {
+        console.log("Form is not complete");
+      }
     }
   }
 };
