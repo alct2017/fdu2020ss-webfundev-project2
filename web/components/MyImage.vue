@@ -23,8 +23,13 @@
                 <b-card-body :title="imageList[firstRows+index-1].title">
                   <b-card-text>{{imageList[firstRows+index-1].description}}</b-card-text>
                   <b-button
+                    variant="outline-primary"
+                    class="mr-2"
+                    :to="{name:'upload',params:{imageid:imageList[firstRows+index-1].id}}"
+                  >Modify</b-button>
+                  <b-button
                     variant="outline-danger"
-                    class="active"
+                    class="mr-2"
                     @click="deleteImage(imageList[firstRows+index-1].id)"
                   >Delete</b-button>
                 </b-card-body>

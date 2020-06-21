@@ -18,8 +18,3 @@ services:
             - ./web:/var/www/html
         ports: 
             - 80:80
-
-    adminer:
-        image: adminer
-        ports: 
-            - 8088:8080

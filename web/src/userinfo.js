@@ -115,6 +115,37 @@ export default new Vuex.Store({
         delete(context, { imageid }) {
             context.dispatch("request", ["../api/DeleteImage.php", { id: context.getters.getUID, imageid: imageid }])
         },
-        modify() { }
+        modify(context, {
+            imageid,
+            title,
+            description,
+            city,
+            country,
+            content,
+            file
+        }) {
+            let formData = new FormData();
+            formData.append("id", context.getters.getUID);
+            formData.append("imageid",imageid);
+            formData.append("title", title);
+            formData.append("description", description);
+            formData.append("city", city);
+            formData.append("country", country);
+            formData.append("file", file);
+            formData.append("content", content);
+            return new Promise((resolve = () => { }, reject = error => console.log(error)) => {
+                axios
+                    .post("../api/ModifyImage.php", formData)
+                    .then(responce => {
+                        if (responce["data"]["actionState"]) {
+                            context.dispatch("freshUserinfo");
+                            resolve(responce["data"]["id"]);
+                        } else {
+                            reject(responce["data"]["error"]);
+                        }
+                    })
+                    .catch(error => reject(error));
+            });
+        }
     },
 });

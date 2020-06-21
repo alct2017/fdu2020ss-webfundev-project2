@@ -31,7 +31,7 @@ const router = new VueRouter({
                         { name: 'home', path: '', component: Home },
                         { name: 'browser', path: 'browser', component: Browser },
                         { name: 'search', path: 'search', component: Search },
-                        { name: 'upload', path: 'upload', component: Upload },
+                        { name: 'upload', path: 'upload/:imageid', component: Upload },
                         { name: 'detail', path: 'detail/:id', component: Detail },
                         { name: 'favor', path: 'favor', component: Favor },
                         { name: 'image', path: 'image', component: Image }

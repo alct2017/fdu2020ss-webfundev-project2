@@ -9,3 +9,9 @@ services:
     ports: 
       - "8080:8080"
     command: /bin/sh -c "while sleep 1000; do :; done"
+
+    
+    adminer:
+        image: adminer
+        ports: 
+            - 8088:8080
